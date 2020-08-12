@@ -1,25 +1,72 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
+import CharComponent from './CharComponent/CharComponent';
+import CharacterInputComponent from './CharacterInputComponent/CharacterInputComponent';
+import ValidationComponent from './ValidationComponent/ValidationComponent';
 import './App.css';
-import UserInput from './UserInput/UserInput';
-import UserOutput from './UserOutput/UserOutput';
-import './UserOutput/UserOutput.css';
+
+// import logo from './logo.svg';
+// import UserOutput from './UserOutput/UserOutput';
+// import './UserOutput/UserOutput.css';
 
 class App extends Component {
   
   state = {
-    name: 'Toodle'
+    name: 'Toodle',
+    inputLength: 0,
+    inputCharacterString: "",
+    inputCharacters: []
   }
   
+
+  characterInputHandler = (event) => {
+    const inputValue = event.target.value;    
+    const inputLength = inputValue.length;
+    // Update inputCharacters array
+    const updateInputCharacters = inputValue.split('');
+ 
+    this.setState({inputLength: inputLength, inputCharacters: updateInputCharacters, inputCharacterString: inputValue});
+  }
+
+  deleteCharacterHandler = (index) => {
+    // Get the characters from state.
+    const inputChar = [...this.state.inputCharacters];
+    let inputCharString = "";
+
+    inputChar.splice(index,1);
+    // Update input field
+    inputCharString = inputChar.join('');
+    this.setState({inputCharacters: inputChar, inputCharacterString: inputCharString});    // Update state.    
+  }
 
   nameChangeHandler = (event) => {
     this.setState({
       name:  event.target.value
     })
-    // console.log();
   }
 
+
   render () {
+    let inputCharacters = null;
+
+    if(this.state.inputCharacters.length){
+
+      inputCharacters = (
+        <div>
+          {this.state.inputCharacters.map( (character, index) => {
+            const charKey = "inputChar-" + index;
+
+            return <CharComponent
+              char={character}
+              charKey={charKey} 
+              charIndex={index}
+              key={charKey}
+              click={() => this.deleteCharacterHandler(index)}
+              />
+          })}
+        </div>
+      )
+        
+    }
 
     return(
       <div className="App">
@@ -34,15 +81,19 @@ class App extends Component {
           </a>
           */}
           
-          <UserInput 
-            changeName={this.nameChangeHandler}
-            name={this.state.name}
+          <CharacterInputComponent
+            countInput={this.characterInputHandler}
+            inputValue={this.state.inputCharacterString}
           /> 
-
-          <UserOutput name={this.state.name}>
-
-          </UserOutput>
           
+          <ValidationComponent 
+            inputCount={this.state.inputLength}
+            charString={this.state.inputCharString}
+          />
+
+          {inputCharacters}
+
+           
         </header>
       </div>
     )
